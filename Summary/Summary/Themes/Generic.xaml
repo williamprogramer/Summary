@@ -1,0 +1,21 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="using:Summary.Controls">
+
+    <Style TargetType="controls:OverlayControl">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="controls:OverlayControl">
+                    <Grid>
+                        <ContentPresenter />
+                        <Grid x:Name="OverlayGrid" Background="#80000000">
+                            <ProgressRing IsActive="True"
+                                          HorizontalAlignment="Center"
+                                          VerticalAlignment="Center" />
+                        </Grid>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>
