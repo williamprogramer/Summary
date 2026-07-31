@@ -9,13 +9,13 @@ namespace Summary.Controls
     public sealed partial class OverlayControl : ContentControl
     {
         private Grid? _overlayGrid;
-        public bool IsBussy
+        public bool IsBusy
         {
-            get => (bool)GetValue(IsBussyProperty);
-            set => SetValue(IsBussyProperty, value);
+            get => (bool)GetValue(IsBusyProperty);
+            set => SetValue(IsBusyProperty, value);
         }
 
-        public static readonly DependencyProperty IsBussyProperty = DependencyProperty.Register(nameof(IsBussy), typeof(bool), typeof(OverlayControl), new PropertyMetadata(false, OnIsBussyChanged));
+        public static readonly DependencyProperty IsBusyProperty = DependencyProperty.Register(nameof(IsBusy), typeof(bool), typeof(OverlayControl), new PropertyMetadata(false, OnIsBussyChanged));
 
         private static void OnIsBussyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -27,7 +27,7 @@ namespace Summary.Controls
         {
             base.OnApplyTemplate();
             _overlayGrid = GetTemplateChild("OverlayGrid") as Grid;
-            UpdateOverlayVisibility(IsBussy);
+            UpdateOverlayVisibility(IsBusy);
         }
 
         public OverlayControl()
@@ -35,9 +35,9 @@ namespace Summary.Controls
             DefaultStyleKey = typeof(OverlayControl);
         }
 
-        private void UpdateOverlayVisibility(bool isBussy)
+        private void UpdateOverlayVisibility(bool isBusy)
         {
-            _overlayGrid?.Visibility = isBussy ? Visibility.Visible : Visibility.Collapsed;
+            _overlayGrid?.Visibility = isBusy ? Visibility.Visible : Visibility.Collapsed;
         }
     }
 }

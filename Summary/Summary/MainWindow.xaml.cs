@@ -8,7 +8,7 @@ using Summary.Helpers;
 using Summary.Services;
 using Summary.Views;
 using System;
-using System.Threading.Tasks;
+using Windows.Graphics;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -29,11 +29,16 @@ namespace Summary
             Title = SummaryConstants.APP_NAME;
             Busy = App.ServiceProvider.GetRequiredService<BusyService>();
             _logger = App.ServiceProvider.GetRequiredService<ILogger<MainWindow>>();
+            AppWindow.Resize(new SizeInt32(1024, 768));
             ExtendsContentIntoTitleBar = true;
             AppWindow.TitleBar.PreferredHeightOption = TitleBarHeightOption.Standard;
             AppWindow.SetIcon("Assets/StoreLogo.ico");
             RootTitleBar.Subtitle = SummaryConstants.APP_VERSION;
             SetTitleBar(RootTitleBar);
+            OverlappedPresenter presenter = OverlappedPresenter.Create();
+            presenter.PreferredMinimumWidth = 1024;
+            presenter.PreferredMinimumHeight = 768;
+            AppWindow.SetPresenter(presenter);
             RootFrame.Navigate(typeof(DefaultView));
             _logger.LogInformation("MainWindow initialized successfully.");
         }

@@ -59,10 +59,6 @@ namespace Summary
             {
                 IDbContextFactory<SummaryDBContext> dbContextFactory = ServiceProvider.GetRequiredService<IDbContextFactory<SummaryDBContext>>();
                 using SummaryDBContext context = dbContextFactory.CreateDbContext();
-#if DEBUG
-                context.Database.EnsureDeleted();
-                Log.Information("Database deleted.");
-#endif
                 context.Database.EnsureCreated();
                 Log.Information("Database created.");
                 _window = ServiceProvider.GetRequiredService<MainWindow>();
