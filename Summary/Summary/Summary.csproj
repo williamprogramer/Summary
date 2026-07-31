@@ -15,6 +15,7 @@
     <WindowsPackageType>None</WindowsPackageType>
     <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
     <NoWarn>$(NoWarn);CsWinRT1030</NoWarn>
+    <NoWarn>$(NoWarn);MVVMTK0045</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Views\DefaultView.xaml" />

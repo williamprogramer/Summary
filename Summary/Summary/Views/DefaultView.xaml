@@ -6,16 +6,13 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:viewmodels="using:Summary.ViewModels"
-      xmlns:controls="using:Summary.Controls"
       mc:Ignorable="d"
       d:DataContext="{d:DesignInstance viewmodels:DefaultViewModel}">
 
-    <controls:OverlayControl x:Name="OverlayControl" IsBussy="False">
-        <StackPanel Orientation="Vertical"
-                    Margin="36,40"
-                    Spacing="24">
-            <TextBlock Text="Home"
-                       Style="{StaticResource TitleTextBlockStyle}" />
-        </StackPanel>
-    </controls:OverlayControl>
+    <StackPanel Orientation="Vertical"
+                Margin="36,40"
+                Spacing="24">
+        <TextBlock Text="Home"
+                   Style="{StaticResource TitleTextBlockStyle}" />
+    </StackPanel>
 </Page>

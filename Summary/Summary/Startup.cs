@@ -23,6 +23,7 @@ namespace Summary
             services.AddTransient<SettingsViewModel>();
             services.AddTransient<DefaultViewModel>();
             services.AddTransient<SettingsService>();
+            services.AddSingleton<BusyService>();
             services.AddLogging(configure => configure.AddSerilog());
             services.AddDbContextFactory<SummaryDBContext>(options =>
             {

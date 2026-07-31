@@ -5,18 +5,14 @@
       xmlns:local="using:Summary.Views"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-      xmlns:controls="using:Summary.Controls"
       xmlns:viewmodels="using:Summary.ViewModels"
       mc:Ignorable="d"
       d:DataContext="{d:DesignInstance viewmodels:SettingsViewModel}">
 
-    <controls:OverlayControl x:Name="OverlayControl"
-                             IsBussy="False">
-        <StackPanel Orientation="Vertical"
-                    Margin="36,40"
-                    Spacing="24">
-            <TextBlock Text="Settings"
-                       Style="{StaticResource TitleTextBlockStyle}" />
-        </StackPanel>
-    </controls:OverlayControl>
+    <StackPanel Orientation="Vertical"
+                Margin="36,40"
+                Spacing="24">
+        <TextBlock Text="Settings"
+                   Style="{StaticResource TitleTextBlockStyle}" />
+    </StackPanel>
 </Page>

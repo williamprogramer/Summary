@@ -5,8 +5,10 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Summary.Common;
 using Summary.Helpers;
+using Summary.Services;
 using Summary.Views;
 using System;
+using System.Threading.Tasks;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -19,10 +21,13 @@ namespace Summary
     public sealed partial class MainWindow : Window
     {
         private readonly ILogger<MainWindow> _logger = default!;
+        public BusyService Busy { get; }
+
         public MainWindow()
         {
             InitializeComponent();
             Title = SummaryConstants.APP_NAME;
+            Busy = App.ServiceProvider.GetRequiredService<BusyService>();
             _logger = App.ServiceProvider.GetRequiredService<ILogger<MainWindow>>();
             ExtendsContentIntoTitleBar = true;
             AppWindow.TitleBar.PreferredHeightOption = TitleBarHeightOption.Standard;
@@ -50,6 +55,7 @@ namespace Summary
         /// <param name="args">The event data.</param>
         private void RootNavigationView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
         {
+            Busy.IsBusy = true;
             if (args.IsSettingsSelected)
                 RootFrame.Navigate(typeof(SettingsView));
             else
@@ -59,11 +65,10 @@ namespace Summary
                 {
                     string? tag = navigationView.Tag as string;
                     if (!string.IsNullOrWhiteSpace(tag) && NavigationViewHelper.Views.TryGetValue(tag, out Type? view))
-                    {
                         RootFrame.Navigate(view);
-                    }
                 }
             }
+            Busy.IsBusy = false;
         }
     }
 }

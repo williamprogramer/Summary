@@ -3,6 +3,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="using:Summary"
+        xmlns:controls="using:Summary.Controls"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d">
@@ -27,12 +28,15 @@
             </TitleBar.IconSource>
         </TitleBar>
 
-        <NavigationView x:Name="RootNavigationView"
-                        IsBackButtonVisible="Collapsed"
-                        IsPaneToggleButtonVisible="False"
-                        SelectionChanged="RootNavigationView_SelectionChanged"
-                        Grid.Row="1">
-            <Frame x:Name="RootFrame" />
-        </NavigationView>
+        <controls:OverlayControl x:Name="OverlayControl"
+                                 Grid.Row="1"
+                                 IsBussy="{x:Bind Busy.IsBusy, Mode=OneWay}">
+            <NavigationView x:Name="RootNavigationView"
+                            IsBackButtonVisible="Collapsed"
+                            IsPaneToggleButtonVisible="False"
+                            SelectionChanged="RootNavigationView_SelectionChanged">
+                <Frame x:Name="RootFrame" />
+            </NavigationView>
+        </controls:OverlayControl>
     </Grid>
 </Window>
