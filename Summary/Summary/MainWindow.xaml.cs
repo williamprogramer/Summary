@@ -60,7 +60,6 @@ namespace Summary
         /// <param name="args">The event data.</param>
         private void RootNavigationView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
         {
-            Busy.IsBusy = true;
             if (args.IsSettingsSelected)
                 RootFrame.Navigate(typeof(SettingsView));
             else
@@ -73,7 +72,6 @@ namespace Summary
                         RootFrame.Navigate(view);
                 }
             }
-            Busy.IsBusy = false;
         }
     }
 }

@@ -7,14 +7,9 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:viewmodels="using:Summary.ViewModels"
       xmlns:converters="using:Summary.Converters"
+      xmlns:controls="using:Summary.Controls"
       mc:Ignorable="d"
       d:DataContext="{d:DesignInstance viewmodels:SettingsViewModel}">
-    <Page.Resources>
-        <converters:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter" />
-        <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
-        <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
-    </Page.Resources>
-
     <StackPanel Orientation="Vertical"
                 Margin="36,40"
                 Spacing="24">
@@ -22,15 +17,12 @@
         <TextBlock Text="Settings"
                    Style="{StaticResource TitleTextBlockStyle}" />
 
-        <Border Background="{ThemeResource CardBackgroundFillColorDefault}"
-                CornerRadius="4"
-                Padding="16"
-                BorderBrush="{ThemeResource ControlElevationBorderBrush}">
+        <controls:Card>
             <Grid ColumnSpacing="8">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="220" />
+                    <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="220" />
+                    <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <StackPanel Grid.Column="0"
@@ -45,19 +37,26 @@
                         Command="{Binding ValidateOllamaUrlCommand}"
                         VerticalAlignment="Bottom"
                         Grid.Column="1" />
-                <ComboBox x:Name="OllamaModelsComboBox"
-                          Header="Ollama Model"
-                          PlaceholderText="Select a model"
-                          IsEnabled="{Binding IsOllamaURLValid, Mode=OneWay}"
-                          Width="220"
-                          Grid.Column="2" />
+                <StackPanel Grid.Column="2"
+                            Orientation="Vertical"
+                            Spacing="4">
+                    <ComboBox x:Name="OllamaModelsComboBox"
+                              Header="Ollama Model"
+                              PlaceholderText="Select a model"
+                              IsEnabled="{Binding IsOllamaURLValid, Mode=TwoWay}"
+                              DisplayMemberPath="Name"
+                              HorizontalAlignment="Stretch"
+                              ItemsSource="{Binding OllamaModels, Mode=TwoWay}"
+                              SelectedItem="{Binding SelectedOllamaModel, Mode=TwoWay}" />
+                </StackPanel>
                 <Button x:Name="SaveModelButton"
                         Content="Save"
                         VerticalAlignment="Bottom"
                         IsEnabled="{Binding IsOllamaURLValid, Mode=OneWay}"
                         Style="{StaticResource AccentButtonStyle}"
+                        Command="{Binding SaveOllamaSettingsCommand}"
                         Grid.Column="3" />
             </Grid>
-        </Border>
+        </controls:Card>
     </StackPanel>
 </Page>
