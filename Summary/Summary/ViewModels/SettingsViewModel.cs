@@ -22,6 +22,7 @@ namespace Summary.ViewModels
         private readonly ILogger<SettingsViewModel> _logger;
         private readonly IDbContextFactory<SummaryDBContext> _contextFactory;
         private readonly OllamaService _ollamaService;
+        private readonly SettingsService _settingsService = default!;
 
         [ObservableProperty]
         public partial bool IsOllamaURLValid { get; set; } = false;
@@ -37,6 +38,7 @@ namespace Summary.ViewModels
             _logger = App.ServiceProvider.GetRequiredService<ILogger<SettingsViewModel>>();
             _contextFactory = App.ServiceProvider.GetRequiredService<IDbContextFactory<SummaryDBContext>>();
             _ollamaService = App.ServiceProvider.GetRequiredService<OllamaService>();
+            _settingsService = App.ServiceProvider.GetRequiredService<SettingsService>();
         }
 
         [RelayCommand]
@@ -98,11 +100,10 @@ namespace Summary.ViewModels
             _busy.IsBusy = true;
             try
             {
-                await CreateKeysIfMissingAsync();
+                await _settingsService.CreateKeysIfMissingAsync();
 
-                using SummaryDBContext context = await _contextFactory.CreateDbContextAsync();
-                SettingsEntity? uri = await context.Settings.FirstOrDefaultAsync(s => s.Key == SummaryConstants.OLLAMA_URI);
-                SettingsEntity? model = await context.Settings.FirstOrDefaultAsync(s => s.Key == SummaryConstants.OLLAMA_MODEL);
+                SettingsEntity? uri = await _settingsService.GetSettingByKeyAsync(SummaryConstants.OLLAMA_URI);
+                SettingsEntity? model = await _settingsService.GetSettingByKeyAsync(SummaryConstants.OLLAMA_MODEL);
 
                 OllamaUrl = uri?.Value ?? string.Empty;
 
@@ -116,14 +117,10 @@ namespace Summary.ViewModels
                 List<OllamaModel> models = await _ollamaService.GetOllamaModelsAsync(OllamaUrl);
                 OllamaModels.Clear();
                 foreach (OllamaModel ollamaModel in models)
-                {
                     OllamaModels.Add(ollamaModel);
-                }
 
                 if (!string.IsNullOrEmpty(model?.Value))
-                {
                     SelectedOllamaModel = OllamaModels.FirstOrDefault(m => m.Name == model.Value);
-                }
             }
             catch (Exception ex)
             {
@@ -133,31 +130,6 @@ namespace Summary.ViewModels
             finally
             {
                 _busy.IsBusy = false;
-            }
-        }
-
-        private async Task CreateKeysIfMissingAsync()
-        {
-            try
-            {
-                using SummaryDBContext context = await _contextFactory.CreateDbContextAsync();
-                SettingsEntity? uri = await context.Settings.FirstOrDefaultAsync(s => s.Key == SummaryConstants.OLLAMA_URI);
-                SettingsEntity? model = await context.Settings.FirstOrDefaultAsync(s => s.Key == SummaryConstants.OLLAMA_MODEL);
-                if (uri is null)
-                {
-                    uri = new SettingsEntity { Key = SummaryConstants.OLLAMA_URI, Value = string.Empty };
-                    context.Settings.Add(uri);
-                }
-                if (model is null)
-                {
-                    model = new SettingsEntity { Key = SummaryConstants.OLLAMA_MODEL, Value = string.Empty };
-                    context.Settings.Add(model);
-                }
-                await context.SaveChangesAsync();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error creating keys if missing.");
             }
         }
     }

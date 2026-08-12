@@ -2,7 +2,7 @@
 
 namespace Summary.Data.Entities
 {
-    internal class BaseEntity
+    public class BaseEntity
     {
         public Guid Id { get; set; } = Guid.NewGuid();
     }
