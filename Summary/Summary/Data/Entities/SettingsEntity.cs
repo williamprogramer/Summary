@@ -1,6 +1,6 @@
 ﻿namespace Summary.Data.Entities
 {
-    internal class SettingsEntity : BaseEntity
+    public class SettingsEntity : BaseEntity
     {
         /// <summary>
         /// Gets or sets the key of the setting. This property is used to identify the setting in the database.

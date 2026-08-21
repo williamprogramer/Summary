@@ -1,13 +1,11 @@
-﻿using System.Reflection;
-
-namespace Summary.Common
+﻿namespace Summary.Common
 {
-    internal static class SummaryConstants
+    public static class SummaryConstants
     {
-        public static readonly string OLLAMA_URI = "OLLAMA_URI";
-        public static readonly string OLLAMA_MODEL = "OLLAMA_MODEL";
-        public static readonly string WHISPER_MODEL = "WHISPER_MODEL";
-        public static readonly string APP_NAME = "Summary";
-        public static readonly string APP_VERSION = Assembly.GetExecutingAssembly().GetName().Version!.ToString();
+        public const string OLLAMA_URI = "OLLAMA_URI";
+        public const string OLLAMA_MODEL = "OLLAMA_MODEL";
+        public const string WHISPER_MODEL = "WHISPER_MODEL";
+        public const string APP_NAME = "Summary";
+        public const string APP_VERSION = "1.0.0";
     }
 }

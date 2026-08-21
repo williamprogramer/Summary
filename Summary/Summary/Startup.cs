@@ -24,6 +24,7 @@ namespace Summary
             services.AddTransient<DefaultViewModel>();
             services.AddTransient<SettingsService>();
             services.AddSingleton<BusyService>();
+            services.AddTransient<NAudioService>();
             services.AddLogging(configure => configure.AddSerilog());
             services.AddDbContextFactory<SummaryDBContext>(options =>
             {

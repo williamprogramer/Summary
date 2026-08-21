@@ -6,13 +6,35 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:viewmodels="using:Summary.ViewModels"
+      xmlns:converters="using:Summary.Converters"
       mc:Ignorable="d"
       d:DataContext="{d:DesignInstance viewmodels:DefaultViewModel}">
-
+    <Page.Resources>
+        <converters:InverseBooleanConverter x:Key="InverseBooleanConverter" />
+    </Page.Resources>
     <StackPanel Orientation="Vertical"
                 Margin="36,40"
                 Spacing="24">
         <TextBlock Text="Home"
                    Style="{StaticResource TitleTextBlockStyle}" />
+        <StackPanel Orientation="Horizontal"
+                    Spacing="4"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center">
+            <Button Command="{Binding StartRecordingCommand}" IsEnabled="{Binding IsRecording, Converter={StaticResource InverseBooleanConverter}}">
+                <FontIcon Glyph="&#xE768;"
+                          FontSize="16" />
+            </Button>
+            <Button IsEnabled="{Binding IsRecording, Mode=TwoWay}" Command="{Binding StopRecordingCommand}">
+                <FontIcon Glyph="&#xEE95;"
+                          FontSize="16" />
+            </Button>
+            <FontIcon Glyph="&#xE7C8;"
+                      Foreground="Gray"
+                      FontSize="16" />
+            <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}"
+                       Text="{Binding Time, Mode=TwoWay}"
+                       VerticalAlignment="Center" />
+        </StackPanel>
     </StackPanel>
 </Page>
