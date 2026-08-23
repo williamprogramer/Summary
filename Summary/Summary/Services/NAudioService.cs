@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using NAudio.CoreAudioApi;
 using NAudio.Extras;
 using NAudio.Wave;
@@ -11,45 +12,34 @@ namespace Summary.Services
 {
     public class NAudioService
     {
-        private readonly ILogger<NAudioService> _logger;
         private WasapiRecorder? _micRecorder;
         private WasapiRecorder? _systemRecorder;
         private RealtimeCaptureMixer? _mixer;
         private WaveFileWriter? _writer;
         private Task? _pumpTask;
         private bool _stop;
+        private ILogger<NAudioService> _logger;
 
         /// <summary>
         /// Boost applied to the microphone before mixing. Increase if the mic sounds too quiet in the recording.
         /// </summary>
         public float MicGain { get; set; } = 4f;
 
-        public NAudioService(ILogger<NAudioService> logger)
+        public NAudioService()
         {
-            _logger = logger;
+            _logger = App.ServiceProvider.GetRequiredService<ILogger<NAudioService>>();
         }
 
         public void Start(string filename)
         {
-            using var enumerator = new MMDeviceEnumerator();
-            var renderDevice = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
-            var captureDevice = enumerator.GetDefaultAudioEndpoint(DataFlow.Capture, Role.Multimedia);
+            using MMDeviceEnumerator enumerator = new();
+            MMDevice renderDevice = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
+            MMDevice captureDevice = enumerator.GetDefaultAudioEndpoint(DataFlow.Capture, Role.Multimedia);
 
-            var systemNative = GetNativeFormat(renderDevice);
-            var micNative = GetNativeFormat(captureDevice);
-            var unifiedRate = Math.Max(systemNative.SampleRate, micNative.SampleRate);
-            var targetFormat = WaveFormat.CreateIeeeFloatWaveFormat(unifiedRate, 2);
-
-            _logger.LogInformation(
-                "Recording: system={SystemDevice} ({SystemRate} Hz, {SystemChannels} ch), mic={MicDevice} ({MicRate} Hz, {MicChannels} ch), mix={MixRate} Hz stereo, micGain={MicGain}",
-                renderDevice.FriendlyName,
-                systemNative.SampleRate,
-                systemNative.Channels,
-                captureDevice.FriendlyName,
-                micNative.SampleRate,
-                micNative.Channels,
-                unifiedRate,
-                MicGain);
+            (int systemSampleRate, int systemChannels) = GetNativeFormat(renderDevice);
+            (int micSampleRate, int micChannels) = GetNativeFormat(captureDevice);
+            int unifiedRate = Math.Max(systemSampleRate, micSampleRate);
+            WaveFormat targetFormat = WaveFormat.CreateIeeeFloatWaveFormat(unifiedRate, 2);
 
             _mixer = new RealtimeCaptureMixer(targetFormat);
 
@@ -57,27 +47,26 @@ namespace Summary.Services
                 .WithDevice(renderDevice)
                 .WithLoopbackCapture()
                 .WithPollingSync()
-                .WithFormat(WaveFormat.CreateIeeeFloatWaveFormat(unifiedRate, systemNative.Channels))
+                .WithFormat(WaveFormat.CreateIeeeFloatWaveFormat(unifiedRate, systemChannels))
                 .WithMmcssThreadPriority("Pro Audio")
                 .Build();
 
-            var systemInput = _mixer.AddInput(_systemRecorder.WaveFormat);
+            CaptureMixerInput systemInput = _mixer.AddInput(_systemRecorder.WaveFormat);
             _systemRecorder.DataAvailable += (data, flags, dev, qpc) => systemInput.AddSamples(data);
 
             _micRecorder = new WasapiRecorderBuilder()
                 .WithDevice(captureDevice)
-                .WithFormat(WaveFormat.CreateIeeeFloatWaveFormat(unifiedRate, micNative.Channels))
+                .WithFormat(WaveFormat.CreateIeeeFloatWaveFormat(unifiedRate, micChannels))
                 .WithMmcssThreadPriority("Pro Audio")
                 .Build();
 
-            var micGain = MicGain;
-            var micInput = _mixer.AddInput(_micRecorder.WaveFormat, provider =>
-                new VolumeSampleProvider(provider) { Volume = micGain });
+            float micGain = MicGain;
+            CaptureMixerInput micInput = _mixer.AddInput(_micRecorder.WaveFormat, provider => new VolumeSampleProvider(provider) { Volume = micGain });
             _micRecorder.DataAvailable += (data, flags, dev, qpc) => micInput.AddSamples(data);
 
             _writer = new WaveFileWriter(filename, _mixer.WaveFormat);
 
-            var buffer = new float[_mixer.WaveFormat.SampleRate * _mixer.WaveFormat.Channels / 5];
+            float[] buffer = new float[_mixer.WaveFormat.SampleRate * _mixer.WaveFormat.Channels / 5];
             _stop = false;
             _pumpTask = Task.Run(() =>
             {
@@ -115,8 +104,8 @@ namespace Summary.Services
         {
             try
             {
-                using var audioClient = device.CreateAudioClient();
-                var mix = audioClient.MixFormat;
+                using AudioClient audioClient = device.CreateAudioClient();
+                WaveFormat mix = audioClient.MixFormat;
                 return (mix.SampleRate, mix.Channels);
             }
             catch
