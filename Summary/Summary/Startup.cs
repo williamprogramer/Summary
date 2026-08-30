@@ -4,6 +4,7 @@ using Serilog;
 using Summary.Data;
 using Summary.Helpers;
 using Summary.Services;
+using Summary.Services.Whisper;
 using Summary.ViewModels;
 using System.IO;
 
@@ -24,6 +25,7 @@ namespace Summary
             services.AddTransient<DefaultViewModel>();
             services.AddTransient<SettingsService>();
             services.AddSingleton<BusyService>();
+            services.AddSingleton<WhisperOnnxTranscriber>();
             services.AddTransient<NAudioService>();
             services.AddLogging(configure => configure.AddSerilog());
             services.AddDbContextFactory<SummaryDBContext>(options =>

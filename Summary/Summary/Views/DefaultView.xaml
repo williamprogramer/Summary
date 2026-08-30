@@ -6,12 +6,8 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:viewmodels="using:Summary.ViewModels"
-      xmlns:converters="using:Summary.Converters"
       mc:Ignorable="d"
       d:DataContext="{d:DesignInstance viewmodels:DefaultViewModel}">
-    <Page.Resources>
-        <converters:InverseBooleanConverter x:Key="InverseBooleanConverter" />
-    </Page.Resources>
     <StackPanel Orientation="Vertical"
                 Margin="36,40"
                 Spacing="24">
@@ -21,11 +17,11 @@
                     Spacing="4"
                     HorizontalAlignment="Left"
                     VerticalAlignment="Center">
-            <Button Command="{Binding StartRecordingCommand}" IsEnabled="{Binding IsRecording, Converter={StaticResource InverseBooleanConverter}}">
+            <Button Command="{Binding StartRecordingCommand}">
                 <FontIcon Glyph="&#xE768;"
                           FontSize="16" />
             </Button>
-            <Button IsEnabled="{Binding IsRecording, Mode=TwoWay}" Command="{Binding StopRecordingCommand}">
+            <Button Command="{Binding StopRecordingCommand}">
                 <FontIcon Glyph="&#xEE95;"
                           FontSize="16" />
             </Button>
@@ -36,5 +32,13 @@
                        Text="{Binding Time, Mode=TwoWay}"
                        VerticalAlignment="Center" />
         </StackPanel>
+        <ScrollViewer MaxHeight="420"
+                      HorizontalScrollBarVisibility="Disabled"
+                      VerticalScrollBarVisibility="Auto">
+            <TextBlock Text="{Binding Transcription, Mode=OneWay}"
+                       TextWrapping="WrapWholeWords"
+                       IsTextSelectionEnabled="True"
+                       Style="{StaticResource BodyTextBlockStyle}" />
+        </ScrollViewer>
     </StackPanel>
 </Page>
