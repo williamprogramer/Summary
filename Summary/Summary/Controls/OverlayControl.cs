@@ -15,7 +15,14 @@ namespace Summary.Controls
             set => SetValue(IsBusyProperty, value);
         }
 
+        public string BusyMessage
+        {
+            get => (string)GetValue(BusyMessageProperty);
+            set => SetValue(BusyMessageProperty, value);
+        }
+
         public static readonly DependencyProperty IsBusyProperty = DependencyProperty.Register(nameof(IsBusy), typeof(bool), typeof(OverlayControl), new PropertyMetadata(false, OnIsBussyChanged));
+        public static readonly DependencyProperty BusyMessageProperty = DependencyProperty.Register(nameof(BusyMessage), typeof(string), typeof(OverlayControl), new PropertyMetadata(string.Empty));
 
         private static void OnIsBussyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {

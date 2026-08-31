@@ -6,6 +6,7 @@ using Summary.Helpers;
 using Summary.Services;
 using Summary.Services.Whisper;
 using Summary.ViewModels;
+using System;
 using System.IO;
 
 namespace Summary
@@ -20,11 +21,17 @@ namespace Summary
         {
             ServiceCollection services = new();
             services.AddHttpClient();
+            services.AddHttpClient(WhisperModelDownloadService.HttpClientName, client =>
+            {
+                client.Timeout = TimeSpan.FromHours(2);
+                client.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", "Summary/1.0");
+            });
             services.AddSingleton<MainWindow>();
             services.AddTransient<SettingsViewModel>();
             services.AddTransient<DefaultViewModel>();
             services.AddTransient<SettingsService>();
             services.AddSingleton<BusyService>();
+            services.AddSingleton<WhisperModelDownloadService>();
             services.AddSingleton<WhisperOnnxTranscriber>();
             services.AddTransient<NAudioService>();
             services.AddLogging(configure => configure.AddSerilog());

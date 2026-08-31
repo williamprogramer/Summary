@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.ML.OnnxRuntime;
 using Microsoft.ML.OnnxRuntime.Tensors;
+using Summary.Helpers;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -24,7 +25,7 @@ namespace Summary.Services.Whisper
         public WhisperOnnxTranscriber(ILogger<WhisperOnnxTranscriber> logger)
         {
             _logger = logger;
-            _modelDir = Path.Combine(AppContext.BaseDirectory, "Whisper", "Medium");
+            _modelDir = PathHelper.WhisperLargePath;
         }
 
         public string Transcribe(string wavPath)

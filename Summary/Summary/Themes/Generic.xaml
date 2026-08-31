@@ -9,9 +9,17 @@
                     <Grid>
                         <ContentPresenter />
                         <Grid x:Name="OverlayGrid" Background="#80000000">
-                            <ProgressRing IsActive="True"
-                                          HorizontalAlignment="Center"
-                                          VerticalAlignment="Center" />
+                            <StackPanel HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        Spacing="16">
+                                <ProgressRing IsActive="True"
+                                              HorizontalAlignment="Center" />
+                                <TextBlock Text="{TemplateBinding BusyMessage}"
+                                           HorizontalAlignment="Center"
+                                           TextWrapping="WrapWholeWords"
+                                           Foreground="White"
+                                           MaxWidth="420" />
+                            </StackPanel>
                         </Grid>
                     </Grid>
                 </ControlTemplate>

@@ -30,7 +30,8 @@
 
         <controls:OverlayControl x:Name="OverlayControl"
                                  Grid.Row="1"
-                                 IsBusy="{x:Bind Busy.IsBusy, Mode=OneWay}">
+                                 IsBusy="{x:Bind Busy.IsBusy, Mode=OneWay}"
+                                 BusyMessage="{x:Bind Busy.StatusMessage, Mode=OneWay}">
             <NavigationView x:Name="RootNavigationView"
                             IsBackButtonVisible="Collapsed"
                             IsPaneToggleButtonVisible="False"

@@ -6,7 +6,9 @@ using Serilog;
 using SQLitePCL;
 using Summary.Data;
 using Summary.Helpers;
+using Summary.Services.Whisper;
 using System;
+using System.Threading.Tasks;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -64,11 +66,25 @@ namespace Summary
                 _window = ServiceProvider.GetRequiredService<MainWindow>();
                 _window.Activate();
                 Log.Information("Application launched successfully.");
+                _ = EnsureWhisperModelAsync();
             }
             catch (Exception ex)
             {
                 Log.Fatal(ex, "Application failed to launch.");
                 throw;
+            }
+        }
+
+        private static async Task EnsureWhisperModelAsync()
+        {
+            try
+            {
+                WhisperModelDownloadService downloader = ServiceProvider.GetRequiredService<WhisperModelDownloadService>();
+                await Task.Run(async () => await downloader.EnsureModelsAsync().ConfigureAwait(false));
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Whisper model download failed.");
             }
         }
 

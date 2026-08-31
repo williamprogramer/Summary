@@ -9,12 +9,14 @@ namespace Summary.Helpers
         public static string DatabasePath => Path.Combine(BasePath, "Data");
         public static string LogsPath => Path.Combine(BasePath, "Logs");
         public static string RecordingsPath { get; set; } = Path.Combine(BasePath, "Recordings");
+        public static string WhisperLargePath { get; set; } = Path.Combine(BasePath, "Models", "whisper-large");
 
         public static void EnsureDirectories()
         {
             Directory.CreateDirectory(DatabasePath);
             Directory.CreateDirectory(LogsPath);
             Directory.CreateDirectory(RecordingsPath);
+            Directory.CreateDirectory(WhisperLargePath);
         }
     }
 }

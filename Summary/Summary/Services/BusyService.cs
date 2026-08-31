@@ -6,5 +6,7 @@ namespace Summary.Services
     {
         [ObservableProperty]
         public partial bool IsBusy { get; set; }
+        [ObservableProperty]
+        public partial string StatusMessage { get; set; } = string.Empty;
     }
 }
