@@ -39,7 +39,9 @@ namespace Summary
             presenter.PreferredMinimumWidth = 1024;
             presenter.PreferredMinimumHeight = 768;
             AppWindow.SetPresenter(presenter);
-            RootFrame.Navigate(typeof(DefaultView));
+            RootNavigationView.SelectedItem = HomeNavItem;
+            if (RootFrame.Content is null)
+                RootFrame.Navigate(typeof(DefaultView));
             _logger.LogInformation("MainWindow initialized successfully.");
         }
 
@@ -65,10 +67,10 @@ namespace Summary
                 RootFrame.Navigate(typeof(SettingsView));
             else
             {
-                NavigationView? navigationView = args.SelectedItem as NavigationView;
-                if (navigationView is not null)
+                NavigationViewItem? item = args.SelectedItem as NavigationViewItem;
+                if (item is not null)
                 {
-                    string? tag = navigationView.Tag as string;
+                    string? tag = item.Tag as string;
                     if (!string.IsNullOrWhiteSpace(tag) && NavigationViewHelper.Views.TryGetValue(tag, out Type? view))
                         RootFrame.Navigate(view);
                 }

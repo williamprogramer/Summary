@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page x:Class="Summary.Views.LiveTranslationView"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:viewmodels="using:Summary.ViewModels"
+      mc:Ignorable="d"
+      d:DataContext="{d:DesignInstance viewmodels:LiveTranslationViewModel}">
+    <Grid Margin="36,40"
+          RowSpacing="16"
+          ColumnSpacing="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <TextBlock Grid.Row="0"
+                   Grid.ColumnSpan="2"
+                   Text="Traducción en vivo"
+                   Style="{StaticResource TitleTextBlockStyle}" />
+
+        <StackPanel Grid.Row="1"
+                    Grid.ColumnSpan="2"
+                    Orientation="Horizontal"
+                    Spacing="8"
+                    VerticalAlignment="Center">
+            <Button Command="{Binding PlayCommand}"
+                    ToolTipService.ToolTip="Play">
+                <FontIcon Glyph="&#xE768;"
+                          FontSize="16" />
+            </Button>
+            <Button Command="{Binding PauseCommand}"
+                    ToolTipService.ToolTip="Pause">
+                <FontIcon Glyph="&#xE769;"
+                          FontSize="16" />
+            </Button>
+            <Button Command="{Binding StopCommand}"
+                    ToolTipService.ToolTip="Stop">
+                <FontIcon Glyph="&#xEE95;"
+                          FontSize="16" />
+            </Button>
+            <FontIcon Glyph="&#xE7C8;"
+                      Foreground="Gray"
+                      FontSize="16" />
+            <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}"
+                       Text="{Binding Time, Mode=OneWay}"
+                       VerticalAlignment="Center" />
+        </StackPanel>
+
+        <StackPanel Grid.Row="2"
+                    Grid.ColumnSpan="2"
+                    Spacing="4">
+            <TextBlock Text="Solo audio del sistema (loopback). Retraso típico de 2–5 s; no es interpretación a 0 s."
+                       Style="{StaticResource CaptionTextBlockStyle}"
+                       Opacity="0.8"
+                       TextWrapping="WrapWholeWords" />
+            <TextBlock Text="{Binding ErrorMessage, Mode=OneWay}"
+                       Foreground="DarkRed"
+                       TextWrapping="WrapWholeWords" />
+        </StackPanel>
+
+        <Grid Grid.Row="3"
+              Grid.Column="0"
+              RowSpacing="8">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <TextBlock Text="English"
+                       Style="{StaticResource SubtitleTextBlockStyle}" />
+            <ScrollViewer Grid.Row="1"
+                          HorizontalScrollBarVisibility="Disabled"
+                          VerticalScrollBarVisibility="Auto">
+                <TextBlock Text="{Binding EnglishText, Mode=OneWay}"
+                           TextWrapping="WrapWholeWords"
+                           IsTextSelectionEnabled="True"
+                           Style="{StaticResource BodyTextBlockStyle}" />
+            </ScrollViewer>
+        </Grid>
+
+        <Grid Grid.Row="3"
+              Grid.Column="1"
+              RowSpacing="8">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <TextBlock Text="Español"
+                       Style="{StaticResource SubtitleTextBlockStyle}" />
+            <ScrollViewer Grid.Row="1"
+                          HorizontalScrollBarVisibility="Disabled"
+                          VerticalScrollBarVisibility="Auto">
+                <TextBlock Text="{Binding SpanishText, Mode=OneWay}"
+                           TextWrapping="WrapWholeWords"
+                           IsTextSelectionEnabled="True"
+                           Style="{StaticResource BodyTextBlockStyle}" />
+            </ScrollViewer>
+        </Grid>
+    </Grid>
+</Page>

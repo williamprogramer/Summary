@@ -17,6 +17,7 @@ namespace Summary.Services.Whisper
 
         private readonly Dictionary<int, string> _idToToken;
         private readonly Dictionary<char, byte> _unicodeToByte;
+        private readonly Dictionary<string, int> _langToId;
         private readonly HashSet<int> _languageTokenIds;
         private readonly HashSet<int> _suppressTokens;
 
@@ -25,12 +26,28 @@ namespace Summary.Services.Whisper
             _idToToken = LoadVocab(Path.Combine(modelDir, "vocab.json"));
             MergeAddedTokens(_idToToken, Path.Combine(modelDir, "added_tokens.json"));
             _unicodeToByte = BuildUnicodeToByte();
-            _languageTokenIds = LoadLanguageIds(Path.Combine(modelDir, "generation_config.json"));
+            _langToId = LoadLanguageMap(Path.Combine(modelDir, "generation_config.json"));
+            _languageTokenIds = [.. _langToId.Values];
             _suppressTokens = LoadSuppressTokens(Path.Combine(modelDir, "generation_config.json"));
         }
 
         public IReadOnlySet<int> LanguageTokenIds => _languageTokenIds;
         public IReadOnlySet<int> SuppressTokens => _suppressTokens;
+
+        public bool TryGetLanguageToken(string language, out int tokenId)
+        {
+            tokenId = 0;
+            if (string.IsNullOrWhiteSpace(language))
+                return false;
+
+            if (_langToId.TryGetValue(language, out tokenId))
+                return true;
+
+            string wrapped = language.StartsWith("<|", StringComparison.Ordinal)
+                ? language
+                : $"<|{language}|>";
+            return _langToId.TryGetValue(wrapped, out tokenId);
+        }
 
         public string Decode(IReadOnlyList<int> tokenIds)
         {
@@ -85,20 +102,20 @@ namespace Summary.Services.Whisper
                 idToToken[id] = token;
         }
 
-        private static HashSet<int> LoadLanguageIds(string path)
+        private static Dictionary<string, int> LoadLanguageMap(string path)
         {
-            HashSet<int> ids = new();
+            Dictionary<string, int> map = new(StringComparer.OrdinalIgnoreCase);
             using JsonDocument doc = JsonDocument.Parse(File.ReadAllText(path));
-            if (!doc.RootElement.TryGetProperty("lang_to_id", out JsonElement map))
-                return ids;
+            if (!doc.RootElement.TryGetProperty("lang_to_id", out JsonElement element))
+                return map;
 
-            foreach (JsonProperty property in map.EnumerateObject())
+            foreach (JsonProperty property in element.EnumerateObject())
             {
                 if (property.Value.TryGetInt32(out int id))
-                    ids.Add(id);
+                    map[property.Name] = id;
             }
 
-            return ids;
+            return map;
         }
 
         private static HashSet<int> LoadSuppressTokens(string path)

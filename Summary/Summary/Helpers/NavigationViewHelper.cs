@@ -12,6 +12,9 @@ namespace Summary.Helpers
                 "DefaultView", typeof(DefaultView)
             },
             {
+                "LiveTranslationView", typeof(LiveTranslationView)
+            },
+            {
                 "SettingsView", typeof(SettingsView)
             }
         };

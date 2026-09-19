@@ -10,6 +10,13 @@ using System.Threading.Tasks;
 
 namespace Summary.Services
 {
+    public sealed class LoopbackAudioEventArgs : EventArgs
+    {
+        public required float[] Samples { get; init; }
+        public required int SampleRate { get; init; }
+        public required int Channels { get; init; }
+    }
+
     public class NAudioService
     {
         private WasapiRecorder? _micRecorder;
@@ -18,7 +25,13 @@ namespace Summary.Services
         private WaveFileWriter? _writer;
         private Task? _pumpTask;
         private bool _stop;
+        private WasapiRecorder? _loopbackRecorder;
+        private RealtimeCaptureMixer? _loopbackMixer;
+        private Task? _loopbackPumpTask;
+        private bool _loopbackStop;
         private ILogger<NAudioService> _logger;
+
+        public event EventHandler<LoopbackAudioEventArgs>? LoopbackDataAvailable;
 
         /// <summary>
         /// Boost applied to the microphone before mixing. Increase if the mic sounds too quiet in the recording.
@@ -98,6 +111,76 @@ namespace Summary.Services
 
             _writer?.Dispose();
             _writer = null;
+        }
+
+        public void StartLoopback()
+        {
+            StopLoopback();
+
+            using MMDeviceEnumerator enumerator = new();
+            MMDevice renderDevice = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
+            (int systemSampleRate, int systemChannels) = GetNativeFormat(renderDevice);
+            WaveFormat targetFormat = WaveFormat.CreateIeeeFloatWaveFormat(systemSampleRate, 2);
+
+            _loopbackMixer = new RealtimeCaptureMixer(targetFormat);
+            _loopbackRecorder = new WasapiRecorderBuilder()
+                .WithDevice(renderDevice)
+                .WithLoopbackCapture()
+                .WithPollingSync()
+                .WithFormat(WaveFormat.CreateIeeeFloatWaveFormat(systemSampleRate, systemChannels))
+                .WithMmcssThreadPriority("Pro Audio")
+                .Build();
+
+            CaptureMixerInput systemInput = _loopbackMixer.AddInput(_loopbackRecorder.WaveFormat);
+            _loopbackRecorder.DataAvailable += (data, flags, dev, qpc) => systemInput.AddSamples(data);
+
+            float[] buffer = new float[targetFormat.SampleRate * targetFormat.Channels / 5];
+            _loopbackStop = false;
+            RealtimeCaptureMixer mixer = _loopbackMixer;
+            int sampleRate = targetFormat.SampleRate;
+            int channels = targetFormat.Channels;
+            _loopbackPumpTask = Task.Run(() =>
+            {
+                while (!_loopbackStop)
+                {
+                    int read = mixer.Read(buffer, 0, buffer.Length);
+                    if (read > 0)
+                    {
+                        float[] copy = new float[read];
+                        Array.Copy(buffer, copy, read);
+                        LoopbackDataAvailable?.Invoke(this, new LoopbackAudioEventArgs
+                        {
+                            Samples = copy,
+                            SampleRate = sampleRate,
+                            Channels = channels
+                        });
+                    }
+                    else
+                    {
+                        Thread.Sleep(5);
+                    }
+                }
+            });
+
+            _loopbackMixer.Start();
+            _loopbackRecorder.StartRecording();
+            _logger.LogInformation("Loopback capture started at {Rate} Hz, {Channels} channels.", sampleRate, channels);
+        }
+
+        public void PauseLoopback() => StopLoopback();
+
+        public void StopLoopback()
+        {
+            _loopbackStop = true;
+            _loopbackPumpTask?.Wait();
+            _loopbackPumpTask = null;
+
+            _loopbackRecorder?.StopRecording();
+            _loopbackRecorder?.Dispose();
+            _loopbackRecorder = null;
+
+            _loopbackMixer = null;
+            _logger.LogInformation("Loopback capture stopped.");
         }
 
         private static (int SampleRate, int Channels) GetNativeFormat(MMDevice device)

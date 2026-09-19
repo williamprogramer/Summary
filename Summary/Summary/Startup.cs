@@ -1,9 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Serilog;
 using Summary.Data;
 using Summary.Helpers;
 using Summary.Services;
+using Summary.Services.Translation;
 using Summary.Services.Whisper;
 using Summary.ViewModels;
 using System;
@@ -29,10 +31,22 @@ namespace Summary
             services.AddSingleton<MainWindow>();
             services.AddTransient<SettingsViewModel>();
             services.AddTransient<DefaultViewModel>();
+            services.AddTransient<LiveTranslationViewModel>();
             services.AddTransient<SettingsService>();
             services.AddSingleton<BusyService>();
+            services.AddSingleton<HuggingFaceModelDownloadService>();
             services.AddSingleton<WhisperModelDownloadService>();
-            services.AddSingleton<WhisperOnnxTranscriber>();
+            services.AddSingleton<LiveModelDownloadService>();
+            services.AddKeyedSingleton<WhisperOnnxTranscriber>(WhisperModelKeys.Large, (sp, _) =>
+                new WhisperOnnxTranscriber(sp.GetRequiredService<ILogger<WhisperOnnxTranscriber>>(), PathHelper.WhisperLargePath));
+            services.AddKeyedSingleton<WhisperOnnxTranscriber>(WhisperModelKeys.Small, (sp, _) =>
+                new WhisperOnnxTranscriber(sp.GetRequiredService<ILogger<WhisperOnnxTranscriber>>(), PathHelper.WhisperSmallPath));
+            services.AddSingleton<OpusMtTranslator>();
+            services.AddTransient<LiveTranslationPipeline>(sp =>
+                new LiveTranslationPipeline(
+                    sp.GetRequiredKeyedService<WhisperOnnxTranscriber>(WhisperModelKeys.Small),
+                    sp.GetRequiredService<OpusMtTranslator>(),
+                    sp.GetRequiredService<ILogger<LiveTranslationPipeline>>()));
             services.AddTransient<NAudioService>();
             services.AddLogging(configure => configure.AddSerilog());
             services.AddDbContextFactory<SummaryDBContext>(options =>

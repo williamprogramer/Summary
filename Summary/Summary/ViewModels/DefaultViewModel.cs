@@ -35,7 +35,7 @@ namespace Summary.ViewModels
         public DefaultViewModel()
         {
             _naudioService = App.ServiceProvider.GetRequiredService<NAudioService>();
-            _transcriber = App.ServiceProvider.GetRequiredService<WhisperOnnxTranscriber>();
+            _transcriber = App.ServiceProvider.GetRequiredKeyedService<WhisperOnnxTranscriber>(WhisperModelKeys.Large);
             _busy = App.ServiceProvider.GetRequiredService<BusyService>();
             Time = _defaultTime;
             _stopwatch = new();

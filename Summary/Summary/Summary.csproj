@@ -19,6 +19,7 @@
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Views\DefaultView.xaml" />
+    <None Remove="Views\LiveTranslationView.xaml" />
     <None Remove="Views\SettingsView.xaml" />
   </ItemGroup>
 
@@ -59,6 +60,11 @@
     <PackageReference Include="Serilog.Extensions.Logging" Version="10.0.0" />
     <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
     <PackageReference Include="SQLitePCLRaw.lib.e_sqlite3" Version="3.53.3" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Views\LiveTranslationView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Page Update="Views\SettingsView.xaml">

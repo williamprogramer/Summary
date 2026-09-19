@@ -51,7 +51,16 @@ namespace Summary.Services.Whisper
                     interleaved.Add(buffer[i]);
             }
 
-            int frames = interleaved.Count / channels;
+            return ToMono16k([.. interleaved], sourceRate, channels);
+        }
+
+        public static float[] ToMono16k(float[] interleaved, int sourceRate, int channels)
+        {
+            channels = Math.Max(1, channels);
+            if (interleaved.Length == 0)
+                return [];
+
+            int frames = interleaved.Length / channels;
             float[] mono = new float[frames];
             for (int i = 0; i < frames; i++)
             {

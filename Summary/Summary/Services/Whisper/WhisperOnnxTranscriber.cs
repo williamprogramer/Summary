@@ -1,7 +1,6 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.ML.OnnxRuntime;
 using Microsoft.ML.OnnxRuntime.Tensors;
-using Summary.Helpers;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -22,31 +21,37 @@ namespace Summary.Services.Whisper
         private WhisperTokenizer? _tokenizer;
         private bool _disposed;
 
-        public WhisperOnnxTranscriber(ILogger<WhisperOnnxTranscriber> logger)
+        public WhisperOnnxTranscriber(ILogger<WhisperOnnxTranscriber> logger, string modelDir)
         {
             _logger = logger;
-            _modelDir = PathHelper.WhisperLargePath;
+            _modelDir = modelDir;
         }
 
-        public string Transcribe(string wavPath)
+        public string Transcribe(string wavPath, string? language = null)
+        {
+            ObjectDisposedException.ThrowIf(_disposed, this);
+            float[] audio = WhisperFeatureExtractor.LoadMono16k(wavPath);
+            return Transcribe(audio, language);
+        }
+
+        public string Transcribe(float[] audio16k, string? language = null)
         {
             ObjectDisposedException.ThrowIf(_disposed, this);
             EnsureLoaded();
 
-            float[] audio = WhisperFeatureExtractor.LoadMono16k(wavPath);
-            if (audio.Length == 0)
+            if (audio16k.Length == 0)
                 return string.Empty;
 
             StringBuilder text = new();
             const int chunk = WhisperFeatureExtractor.NSamples;
-            for (int offset = 0; offset < audio.Length; offset += chunk)
+            for (int offset = 0; offset < audio16k.Length; offset += chunk)
             {
-                int length = Math.Min(chunk, audio.Length - offset);
+                int length = Math.Min(chunk, audio16k.Length - offset);
                 if (offset > 0 && length < WhisperFeatureExtractor.SampleRate)
                     break;
 
-                float[] slice = audio.AsSpan(offset, length).ToArray();
-                string chunkText = TranscribeChunk(slice);
+                float[] slice = audio16k.AsSpan(offset, length).ToArray();
+                string chunkText = TranscribeChunk(slice, language);
                 if (chunkText.Length == 0)
                     continue;
                 if (text.Length > 0 && !char.IsWhiteSpace(chunkText[0]))
@@ -57,7 +62,7 @@ namespace Summary.Services.Whisper
             return text.ToString().Trim();
         }
 
-        private string TranscribeChunk(float[] audio)
+        private string TranscribeChunk(float[] audio, string? language)
         {
             float[] mel = WhisperFeatureExtractor.ComputeLogMel(audio);
             DenseTensor<float> melTensor = new(mel, [1, WhisperFeatureExtractor.NMels, WhisperFeatureExtractor.NFrames]);
@@ -68,7 +73,7 @@ namespace Summary.Services.Whisper
 
             DenseTensor<float> hidden = CopyTensor(FindOutput(encoderResults, "last_hidden_state", "hidden"));
 
-            int languageToken = DetectLanguage(hidden);
+            int languageToken = ResolveLanguageToken(hidden, language);
             List<int> tokens =
             [
                 WhisperTokenizer.SotToken,
@@ -93,6 +98,14 @@ namespace Summary.Services.Whisper
             }
 
             return _tokenizer.Decode(tokens);
+        }
+
+        private int ResolveLanguageToken(DenseTensor<float> encoderHidden, string? language)
+        {
+            if (!string.IsNullOrWhiteSpace(language) && _tokenizer!.TryGetLanguageToken(language, out int forced))
+                return forced;
+
+            return DetectLanguage(encoderHidden);
         }
 
         private int DetectLanguage(DenseTensor<float> encoderHidden)
@@ -338,6 +351,12 @@ namespace Summary.Services.Whisper
                     string.Join(", ", _decoder.InputMetadata.Keys),
                     string.Join(", ", _decoderPast.InputMetadata.Keys));
             }
+        }
+
+        public void EnsureReady()
+        {
+            ObjectDisposedException.ThrowIf(_disposed, this);
+            EnsureLoaded();
         }
 
         public void Dispose()

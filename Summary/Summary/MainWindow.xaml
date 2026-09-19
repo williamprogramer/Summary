@@ -36,6 +36,21 @@
                             IsBackButtonVisible="Collapsed"
                             IsPaneToggleButtonVisible="False"
                             SelectionChanged="RootNavigationView_SelectionChanged">
+                <NavigationView.MenuItems>
+                    <NavigationViewItem x:Name="HomeNavItem"
+                                        Content="Home"
+                                        Tag="DefaultView">
+                        <NavigationViewItem.Icon>
+                            <FontIcon Glyph="&#xE80F;" />
+                        </NavigationViewItem.Icon>
+                    </NavigationViewItem>
+                    <NavigationViewItem Content="Traducción en vivo"
+                                        Tag="LiveTranslationView">
+                        <NavigationViewItem.Icon>
+                            <FontIcon Glyph="&#xF2B7;" />
+                        </NavigationViewItem.Icon>
+                    </NavigationViewItem>
+                </NavigationView.MenuItems>
                 <Frame x:Name="RootFrame" />
             </NavigationView>
         </controls:OverlayControl>
