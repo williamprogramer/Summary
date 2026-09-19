@@ -34,9 +34,6 @@ namespace Summary.ViewModels
         public partial bool IsBusy { get; set; }
 
         [ObservableProperty]
-        public partial string EnglishText { get; set; } = string.Empty;
-
-        [ObservableProperty]
         public partial string SpanishText { get; set; } = string.Empty;
 
         [ObservableProperty]
@@ -92,7 +89,6 @@ namespace Summary.ViewModels
 
                 if (!IsPaused)
                 {
-                    EnglishText = string.Empty;
                     SpanishText = string.Empty;
                     _stopwatch.Reset();
                     Time = _defaultTime;
@@ -191,7 +187,6 @@ namespace Summary.ViewModels
         {
             App.DispatcherQueue.TryEnqueue(() =>
             {
-                EnglishText = Append(EnglishText, segment.English);
                 SpanishText = Append(SpanishText, segment.Spanish);
             });
         }

@@ -8,26 +8,19 @@
       mc:Ignorable="d"
       d:DataContext="{d:DesignInstance viewmodels:LiveTranslationViewModel}">
     <Grid Margin="36,40"
-          RowSpacing="16"
-          ColumnSpacing="16">
+          RowSpacing="16">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
 
         <TextBlock Grid.Row="0"
-                   Grid.ColumnSpan="2"
                    Text="Traducción en vivo"
                    Style="{StaticResource TitleTextBlockStyle}" />
 
         <StackPanel Grid.Row="1"
-                    Grid.ColumnSpan="2"
                     Orientation="Horizontal"
                     Spacing="8"
                     VerticalAlignment="Center">
@@ -55,7 +48,6 @@
         </StackPanel>
 
         <StackPanel Grid.Row="2"
-                    Grid.ColumnSpan="2"
                     Spacing="4">
             <TextBlock Text="Solo audio del sistema (loopback). Retraso típico de 2–5 s; no es interpretación a 0 s."
                        Style="{StaticResource CaptionTextBlockStyle}"
@@ -67,26 +59,6 @@
         </StackPanel>
 
         <Grid Grid.Row="3"
-              Grid.Column="0"
-              RowSpacing="8">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
-            <TextBlock Text="English"
-                       Style="{StaticResource SubtitleTextBlockStyle}" />
-            <ScrollViewer Grid.Row="1"
-                          HorizontalScrollBarVisibility="Disabled"
-                          VerticalScrollBarVisibility="Auto">
-                <TextBlock Text="{Binding EnglishText, Mode=OneWay}"
-                           TextWrapping="WrapWholeWords"
-                           IsTextSelectionEnabled="True"
-                           Style="{StaticResource BodyTextBlockStyle}" />
-            </ScrollViewer>
-        </Grid>
-
-        <Grid Grid.Row="3"
-              Grid.Column="1"
               RowSpacing="8">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
